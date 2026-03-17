@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: redis:8.2
+    ports:
+     - 6379:6379
+    restart: always
+    networks:
+     - backend
+    volumes:
+     - redis_data:/data
+  # core:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+
+volumes:
+  redis_data:
+
+networks:
+  backend:
+    driver: bridge
