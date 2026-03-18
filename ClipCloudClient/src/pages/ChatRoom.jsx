@@ -92,7 +92,7 @@ export default function ChatRoom() {
     }
     return (
 
-        <div className="h-screen flex flex-col items-center bg-blue-600/70">
+        <div className="h-screen flex flex-col items-center bg-blue-300/70">
             <div className="h-screen flex flex-col w-full md:w-xl">
                 <div className="flex justify-center items-center py-2">
                     <div className="rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
