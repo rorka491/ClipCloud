@@ -92,7 +92,7 @@ export default function ChatRoom() {
     }
     return (
 
-        <div className="h-screen flex flex-col items-center bg-blue-300/70">
+        <div className="h-screen flex flex-col items-center bg-blue-600/70">
             <div className="h-screen relative flex flex-col w-full md:w-xl">
                 <div className="absolute  left-[35%] flex justify-center items-center py-2">
                     <div className=" rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
@@ -126,7 +126,7 @@ export default function ChatRoom() {
 
 
 
-                <div className="absolute w-full bottom-0 p-4 flex ">
+                <div className=" absolute w-full bottom-0 p-4 flex ">
                     <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
                         <button onClick={() => setMenuOpen(!menuOpen)} type="button" className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200">
                             <Plus />

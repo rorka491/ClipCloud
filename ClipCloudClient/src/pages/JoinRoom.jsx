@@ -10,16 +10,19 @@ export default function JoinRoom() {
         if (!code.trim()) return;
 
         try {
-            await checkRoom(code)
+            const findRoom = await checkRoom(code)
+            console.log(findRoom)
+            if (findRoom) {
+                navigate(`/room/${code}`);
+            }
 
-            navigate(`/room/${code}`);
         } catch (err) {
             console.error("Ошибка подключения:", err);
         }
     };
 
     return (
-        <div className="bg-blue-400/70 flex w-full h-screen justify-center items-center ">
+        <div className="bg-blue-600/70 flex w-full h-screen justify-center items-center ">
             <div className="flex flex-col gap-2 w-full md:w-sm px-15">
                 <input
                     className="bg-white w-full h-8 text-center rounded-xl outline-none"
