@@ -15,7 +15,7 @@ export default function ChatRoom() {
     const scrollRef = useRef(null);
     const messageTimesRef = useRef([]);
     const textareaRef = useRef(null);
-    
+
 
     useEffect(() => {
         const ws = createSocket(code);
@@ -80,7 +80,7 @@ export default function ChatRoom() {
 
     const handelOnInput = (e) => {
         const el = e.target;
-        el.style.height = "40px"; 
+        el.style.height = "40px";
 
         if (el.value) {
             const newHeight = el.scrollHeight;
@@ -93,9 +93,9 @@ export default function ChatRoom() {
     return (
 
         <div className="h-screen flex flex-col items-center bg-blue-300/70">
-            <div className="h-screen flex flex-col w-full md:w-xl">
-                <div className="flex justify-center items-center py-2">
-                    <div className="rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
+            <div className="h-screen relative flex flex-col w-full md:w-xl">
+                <div className="absolute  left-[35%] flex justify-center items-center py-2">
+                    <div className=" rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
                         {code}
                     </div>
 
@@ -103,21 +103,21 @@ export default function ChatRoom() {
 
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom"
+                    className="flex-1 overflow-y-auto gap-1 p-4 flex flex-col items-end scrollbar-div-custom pb-15"
                 >
                     {messages.map((m, i) => (
                         <>
-                            <div key={i} className="  whitespace-pre-wrap max-w-[70%] bg-white rounded-xl wrap-break-word px-5 py-1 inline-block">
+                            <div key={i} className="  whitespace-pre-wrap max-w-full bg-white rounded-xl wrap-break-word px-5 py-1 inline-flex flex-col">
                                 {m.content}
-
+                                <button
+                                    className="self-end text-end cursor-pointer text-gray-700  hover:text-gray-900 text-sm"
+                                    onClick={() => navigator.clipboard.writeText(m.content)}
+                                    title="Скопировать"
+                                >
+                                    <Copy width={15} />
+                                </button>
                             </div>
-                            <button
-                                className="cursor-pointer mb-2 text-gray-700  hover:text-gray-900 text-sm"
-                                onClick={() => navigator.clipboard.writeText(m.content)}
-                                title="Скопировать"
-                            >
-                                <Copy width={15} />
-                            </button>
+
                         </>
 
 
@@ -126,7 +126,7 @@ export default function ChatRoom() {
 
 
 
-                <div className="p-4 flex ">
+                <div className="absolute w-full bottom-0 p-4 flex ">
                     <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
                         <button onClick={() => setMenuOpen(!menuOpen)} type="button" className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200">
                             <Plus />
