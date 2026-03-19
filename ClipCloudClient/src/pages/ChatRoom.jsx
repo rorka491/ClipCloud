@@ -102,30 +102,6 @@ export default function ChatRoom() {
 
                     </div>
                 </div>
-
-
-                {/* <div
-                    ref={scrollRef}
-                    className="flex-1 overflow-y-auto gap-1 p-4 flex flex-col items-end scrollbar-div-custom pb-15"
-                >
-                    {messages.map((m, i) => (
-                        <>
-                            <div key={i} className="  whitespace-pre-wrap max-w-full bg-white rounded-xl wrap-break-word px-5 py-1 inline-flex flex-col">
-                                {m.content}
-                                <button
-                                    className="self-end text-end cursor-pointer text-gray-700  hover:text-gray-900 text-sm"
-                                    onClick={() => navigator.clipboard.writeText(m.content)}
-                                    title="Скопировать"
-                                >
-                                    <Copy width={15} />
-                                </button>
-                            </div>
-
-                        </>
-
-
-                    ))}
-                </div> */}
                 <div
                     ref={scrollRef}
                     className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom pb-16"
