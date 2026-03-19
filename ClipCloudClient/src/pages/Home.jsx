@@ -14,7 +14,7 @@ export default function Home() {
     };
 
     return (
-        <div className="bg-blue-600/70 flex w-full h-screen justify-center items-center relative">
+        <div className="bg-blue-400/70 flex w-full h-screen justify-center items-center relative">
 
             <div className="fixed rounded-2xl top-5 left-[15%] w-full md:w-[70%] h-30 bg-white flex items-center justify-center shadow z-50">
                 Реклама

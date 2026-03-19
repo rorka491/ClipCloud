@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { ArrowUp, Copy, File, Image, Plus, Video } from "lucide-react";
+import { ArrowUp, Copy, Plus } from "lucide-react";
 import { createSocket } from "../Api/rooms";
 import Popup from "../components/Popup";
 
@@ -92,16 +92,19 @@ export default function ChatRoom() {
     }
     return (
 
-        <div className="h-screen flex flex-col items-center bg-blue-600/70">
-            <div className="h-screen relative flex flex-col w-full md:w-xl">
-                <div className="absolute  left-[35%] flex justify-center items-center py-2">
-                    <div className=" rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
-                        {code}
-                    </div>
+        <div className="h-screen flex flex-col items-center bg-blue-400/70">
+            <div className="h-screen relative flex flex-col w-full ">
+                <div className="flex justify-center">
+                    <div className="absolute flex justify-center items-center py-2">
+                        <div className=" rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
+                            {code}
+                        </div>
 
+                    </div>
                 </div>
 
-                <div
+
+                {/* <div
                     ref={scrollRef}
                     className="flex-1 overflow-y-auto gap-1 p-4 flex flex-col items-end scrollbar-div-custom pb-15"
                 >
@@ -122,33 +125,58 @@ export default function ChatRoom() {
 
 
                     ))}
+                </div> */}
+                <div
+                    ref={scrollRef}
+                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom pb-16"
+                >
+                    <div className="w-full md:w-2xl mx-auto flex flex-col gap-1 items-end">
+                        {messages.map((m, i) => (
+                            <div
+                                key={i}
+                                className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
+                            >
+                                {m.content}
+                                <button
+                                    className="self-end text-gray-700 hover:text-gray-900 text-sm"
+                                    onClick={() => navigator.clipboard.writeText(m.content)}
+                                >
+                                    <Copy width={15} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
+                <div className="flex justify-center">
+                    <div className="absolute w-full md:w-2xl bottom-0 py-4  ">
+                        <div className="w-full border rounded-xl flex ">
+                            <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
+                                <button onClick={() => setMenuOpen(!menuOpen)} type="button" className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200">
+                                    <Plus />
+                                </button>
+                                <Popup menuOpen={menuOpen} />
+                            </div>
+
+                            <textarea
+                                className="flex-1  bg-white p-2 focus:outline-none resize-none h-10 scrollbar-textarea-custom"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleOnKeyDown}
+                                onInput={handelOnInput}
+                                ref={textareaRef}
+                            />
+                            <div className="flex items-end bg-white rounded-r-xl pr-0.5">
+                                <button className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200" onClick={sendMessage}>
+                                    <ArrowUp />
+                                </button>
+                            </div>
+                        </div>
 
 
-                <div className=" absolute w-full bottom-0 p-4 flex ">
-                    <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
-                        <button onClick={() => setMenuOpen(!menuOpen)} type="button" className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200">
-                            <Plus />
-                        </button>
-                        <Popup menuOpen={menuOpen} />
                     </div>
-
-                    <textarea
-                        className="flex-1  bg-white p-2 focus:outline-none resize-none h-10 scrollbar-textarea-custom"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleOnKeyDown}
-                        onInput={handelOnInput}
-                        ref={textareaRef}
-                    />
-                    <div className="flex items-end bg-white rounded-r-xl pr-0.5">
-                        <button className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200" onClick={sendMessage}>
-                            <ArrowUp />
-                        </button>
-                    </div>
-
                 </div>
+
             </div>
         </div>
     );
