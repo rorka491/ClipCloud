@@ -1,10 +1,10 @@
 FROM node:alpine as build
 
 
-COPY package.json packeage.json
+COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
-RUN npm build
+RUN npm run build
 
 
 FROM nginx:stable-alpine
