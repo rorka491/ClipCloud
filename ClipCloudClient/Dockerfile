@@ -1,7 +1,7 @@
 FROM node:alpine as build
 
 
-COPY packeage.json packeage.json
+COPY package.json packeage.json
 RUN npm install
 COPY . .
 RUN npm build
