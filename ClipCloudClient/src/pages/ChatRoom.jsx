@@ -9,24 +9,57 @@ export default function ChatRoom() {
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
-    const [menuOpen, setMenuOpen] = useState(false)
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [blocked, setBlocked] = useState(false);
 
     const socketRef = useRef(null);
     const scrollRef = useRef(null);
-    const messageTimesRef = useRef([]);
     const textareaRef = useRef(null);
-
 
     useEffect(() => {
         const ws = createSocket(code);
 
         ws.onmessage = (event) => {
+            console.log("SERVER:", event.data);
+
             const msg = JSON.parse(event.data);
 
-            if (msg.type === "history") {
-                setMessages(msg.messages);
-            } else {
-                setMessages((prev) => [...prev, msg]);
+            switch (msg.type) {
+                case "history":
+                    setMessages(msg.messages);
+                    break;
+
+                case "text":
+                    setMessages((prev) => [...prev, msg]);
+                    break;
+
+                case "rate_limit":
+                    setBlocked(true);
+                    alert("Слишком много сообщений. Подожди немного.");
+
+                    setTimeout(() => {
+                        setBlocked(false);
+                    }, 3000);
+
+                    break;
+
+                case "error":
+                    if (msg.message?.toLowerCase().includes("too many")) {
+                        setBlocked(true);
+                        alert("Слишком много сообщений. Подожди немного.");
+
+                        setTimeout(() => {
+                            setBlocked(false);
+                        }, 3000);
+
+                        break;
+                    }
+
+                    alert(msg.message || "Ошибка сервера");
+                    break;
+
+                default:
+                    console.log("Unknown message type:", msg);
             }
         };
 
@@ -36,21 +69,7 @@ export default function ChatRoom() {
     }, [code]);
 
     const sendMessage = () => {
-        if (!input.trim() || !socketRef.current) return;
-
-        const now = Date.now();
-
-        const times = messageTimesRef.current.filter(
-            (t) => now - t < 5000
-        );
-
-        if (times.length >= 3) {
-            alert("Too many messages. Wait.");
-            return;
-        }
-
-        times.push(now);
-        messageTimesRef.current = times;
+        if (!input.trim() || !socketRef.current || blocked) return;
 
         socketRef.current.send(
             JSON.stringify({
@@ -60,8 +79,9 @@ export default function ChatRoom() {
         );
 
         setInput("");
+
         if (textareaRef.current) {
-            textareaRef.current.style.height = "40px"
+            textareaRef.current.style.height = "40px";
         }
     };
 
@@ -76,35 +96,37 @@ export default function ChatRoom() {
             e.preventDefault();
             sendMessage();
         }
-    }
+    };
 
-    const handelOnInput = (e) => {
+    const handleOnInput = (e) => {
         const el = e.target;
         el.style.height = "40px";
 
         if (el.value) {
             const newHeight = el.scrollHeight;
             const maxHeight = 120;
+
             if (newHeight > 40) {
                 el.style.height = Math.min(newHeight, maxHeight) + "px";
             }
         }
-    }
-    return (
+    };
 
+    return (
         <div className="h-screen flex flex-col items-center bg-blue-400/70">
-            <div className="h-screen relative flex flex-col w-full ">
+            <div className="h-screen relative flex flex-col w-full">
+
                 <div className="flex justify-center">
                     <div className="absolute flex justify-center items-center py-2">
-                        <div className=" rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
+                        <div className="rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
                             {code}
                         </div>
-
                     </div>
                 </div>
+
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom pb-16"
+                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom py-16"
                 >
                     <div className="w-full md:w-2xl mx-auto flex flex-col gap-1 items-end">
                         {messages.map((m, i) => (
@@ -113,9 +135,12 @@ export default function ChatRoom() {
                                 className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
                             >
                                 {m.content}
+
                                 <button
                                     className="self-end text-gray-700 hover:text-gray-900 text-sm"
-                                    onClick={() => navigator.clipboard.writeText(m.content)}
+                                    onClick={() =>
+                                        navigator.clipboard.writeText(m.content)
+                                    }
                                 >
                                     <Copy width={15} />
                                 </button>
@@ -125,31 +150,43 @@ export default function ChatRoom() {
                 </div>
 
                 <div className="flex justify-center">
-                    <div className="absolute w-full md:w-2xl bottom-0 py-4  ">
-                        <div className="w-full border rounded-xl flex ">
+                    <div className="absolute w-full md:w-2xl bottom-0 py-4">
+                        <div className="w-full border rounded-xl flex">
+
                             <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
-                                <button onClick={() => setMenuOpen(!menuOpen)} type="button" className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200">
+                                <button
+                                    onClick={() => setMenuOpen(!menuOpen)}
+                                    type="button"
+                                    className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200"
+                                >
                                     <Plus />
                                 </button>
+
                                 <Popup menuOpen={menuOpen} />
                             </div>
 
                             <textarea
-                                className="flex-1  bg-white p-2 focus:outline-none resize-none h-10 scrollbar-textarea-custom"
+                                className="flex-1 bg-white p-2 focus:outline-none resize-none h-10 scrollbar-textarea-custom"
                                 value={input}
+                                disabled={blocked}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleOnKeyDown}
-                                onInput={handelOnInput}
+                                onInput={handleOnInput}
                                 ref={textareaRef}
                             />
+
                             <div className="flex items-end bg-white rounded-r-xl pr-0.5">
-                                <button className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200" onClick={sendMessage}>
+                                <button
+                                    disabled={blocked}
+                                    className={`bg-white rounded-3xl px-2 py-2 cursor-pointer transition duration-200 
+                                    ${blocked ? "opacity-50 cursor-not-allowed" : "hover:bg-black/20"}`}
+                                    onClick={sendMessage}
+                                >
                                     <ArrowUp />
                                 </button>
                             </div>
+
                         </div>
-
-
                     </div>
                 </div>
 
