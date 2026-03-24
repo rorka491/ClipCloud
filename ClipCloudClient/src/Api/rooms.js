@@ -1,7 +1,7 @@
-const baseAdrress = "localhost:80"
+// Убираем baseAddress, используем window.location
 
 export const createRoom = async () => {
-  const res = await fetch(`http://${baseAdrress}/api/rooms`, {
+  const res = await fetch(`/api/rooms`, {
     method: "POST",
   });
 
@@ -13,7 +13,7 @@ export const createRoom = async () => {
 };
 
 export const checkRoom = async (code) => {
-  const res = await fetch(`http://${baseAdrress}/api/rooms/${code}`, {
+  const res = await fetch(`/api/rooms/${code}`, {
     method: "GET",
   });
 
@@ -33,7 +33,8 @@ export const checkRoom = async (code) => {
 };
 
 export const createSocket = (code) => {
-  const ws = new WebSocket(`ws://${baseAdrress}/api/ws/${code}`);
+  // Используем текущий хост из браузера
+  const ws = new WebSocket(`ws://${window.location.host}/api/ws/${code}`);
   ws.onopen = () => console.log('✅ Работает!');
   ws.onerror = (e) => console.log('❌ Не работает:', e);
   return ws
