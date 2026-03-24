@@ -40,3 +40,13 @@ export const createSocket = (code) => {
   ws.onerror = (e) => console.log('❌ Не работает:', e);
   return ws
 };
+
+// export const createSocket = (code) => {
+//   const ws = new WebSocket(`ws://127.0.0.1:8000/api/ws/${code}`);
+
+//   ws.onopen = () => console.log("✅ WebSocket connected");
+//   ws.onerror = (e) => console.log("❌ WebSocket error:", e);
+//   ws.onclose = () => console.log("🔴 WebSocket closed");
+
+//   return ws;
+// };

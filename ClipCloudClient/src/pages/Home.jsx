@@ -11,12 +11,13 @@ export default function Home() {
         } catch (err) {
             console.error("Ошибка создания комнаты:", err);
         }
+
     };
 
     return (
         <div className="bg-blue-400/70 flex w-full h-screen justify-center items-center relative">
 
-            <div className="flex flex-col gap-2 w-full md:w-sm px-15 
+            <div className="flex flex-col gap-2 w-full md:w-sm md:px-15 
                             ml-32 mr-32 mt-16 mb-16">
 
                 <button
@@ -27,7 +28,7 @@ export default function Home() {
                 </button>
 
                 <button
-                    className="bg-white hover:text-white cursor-pointer hover:bg-black/25 transition duration-200 h-8 rounded-2xl w-full"
+                    className="bg-white hover:text-white cursor-pointer hover:bg-black/25 transition duration-200 h-8 rounded-2xl  px-5 md:px-0 w-full"
                     onClick={() => navigate("/join")}
                 >
                     Присоединиться

@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { ArrowUp, Copy, Plus } from "lucide-react";
+import { ArrowUp, Plus } from "lucide-react";
 import { createSocket } from "../Api/rooms";
 import Popup from "../components/Popup";
+import CopyButton from "../components/CopyButton";
 
 export default function ChatRoom() {
     const { code } = useParams();
@@ -112,9 +113,10 @@ export default function ChatRoom() {
         }
     };
 
+
     return (
-        <div className="h-screen flex flex-col items-center bg-blue-400/70">
-            <div className="h-screen relative flex flex-col w-full">
+        <div className="h-dvh md:h-screen w-full flex flex-col items-center bg-blue-400/70">
+            <div className="h-full relative flex flex-col w-full">
 
                 <div className="flex justify-center">
                     <div className="absolute flex justify-center items-center py-2">
@@ -126,7 +128,7 @@ export default function ChatRoom() {
 
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom py-16"
+                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom py-18"
                 >
                     <div className="w-full md:w-2xl mx-auto flex flex-col gap-1 items-end">
                         {messages.map((m, i) => (
@@ -136,22 +138,15 @@ export default function ChatRoom() {
                             >
                                 {m.content}
 
-                                <button
-                                    className="self-end text-gray-700 hover:text-gray-900 text-sm"
-                                    onClick={() =>
-                                        navigator.clipboard.writeText(m.content)
-                                    }
-                                >
-                                    <Copy width={15} />
-                                </button>
+                                <CopyButton text={m.content} />
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="flex justify-center">
-                    <div className="absolute w-full md:w-2xl bottom-0 py-4">
-                        <div className="w-full border rounded-xl flex">
+                <div className="flex justify-center pr-3">
+                    <div className="absolute w-full px-3 md:px-0 md:w-2xl bottom-0 py-4">
+                        <div className="w-full border rounded-xl py-1 flex bg-white">
 
                             <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
                                 <button
@@ -166,7 +161,7 @@ export default function ChatRoom() {
                             </div>
 
                             <textarea
-                                className="flex-1 bg-white p-2 focus:outline-none resize-none h-10 scrollbar-textarea-custom"
+                                className="flex-1 min-w-0 bg-white p-2  focus:outline-none resize-none h-10 scrollbar-textarea-custom"
                                 value={input}
                                 disabled={blocked}
                                 onChange={(e) => setInput(e.target.value)}
