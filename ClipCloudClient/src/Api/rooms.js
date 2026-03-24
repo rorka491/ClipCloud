@@ -33,8 +33,9 @@ export const checkRoom = async (code) => {
 };
 
 export const createSocket = (code) => {
-  // Используем текущий хост из браузера
-  const ws = new WebSocket(`ws://${window.location.host}/api/ws/${code}`);
+
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const ws = new WebSocket(`${protocol}//${window.location.host}/api/ws/${code}`);
   ws.onopen = () => console.log('✅ Работает!');
   ws.onerror = (e) => console.log('❌ Не работает:', e);
   return ws
