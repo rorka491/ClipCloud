@@ -10,7 +10,7 @@ from src.dependency.dependency_factory import ws_chat_rate_limit
 from src.dependency.services import get_rate_limiter
 
 
-router = APIRouter()
+router = APIRouter(prefix='/api')
 
 
 connections = ConnectionService()
@@ -19,18 +19,7 @@ message_service = MessageService()
 
 
 
-@router.post("/rooms")
-async def create_room():
-    code = await room_service.create_room()
-    return {"code": code}
-
-@router.post("/rooms/{code}")
-async def get_room(code):
-    code = await room_service.exists(code)
-    return {"is_exists": code}
-
-
-@router.websocket("/rooms/{room_code}")
+@router.websocket("/ws/{room_code}")
 async def websocket_endpoint(websocket: WebSocket, room_code: str, rate_limiter: Annotated[RateLimiter, Depends(get_rate_limiter)]):
     await connections.connect(room_code, websocket)
     history = await message_service.get_messages(room_code)
@@ -66,3 +55,16 @@ async def websocket_endpoint(websocket: WebSocket, room_code: str, rate_limiter:
             })
     except WebSocketDisconnect:
         connections.disconnect(room_code, websocket)
+
+@router.post("/rooms")
+async def create_room():
+    code = await room_service.create_room()
+    return {"code": code}
+
+
+@router.get("/rooms/{code}")
+async def get_room(code):
+    code = await room_service.exists(code)
+    return {"is_exists": code}
+
+

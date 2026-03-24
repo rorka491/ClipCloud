@@ -1,5 +1,7 @@
+const baseAdrress = "localhost:80"
+
 export const createRoom = async () => {
-  const res = await fetch("http://localhost:8000/rooms", {
+  const res = await fetch(`http://${baseAdrress}/api/rooms`, {
     method: "POST",
   });
 
@@ -11,8 +13,8 @@ export const createRoom = async () => {
 };
 
 export const checkRoom = async (code) => {
-  const res = await fetch(`http://localhost:8000/rooms/${code}`, {
-    method: "POST",
+  const res = await fetch(`http://${baseAdrress}/api/rooms/${code}`, {
+    method: "GET",
   });
 
   if (!res.ok) {
@@ -31,5 +33,8 @@ export const checkRoom = async (code) => {
 };
 
 export const createSocket = (code) => {
-  return new WebSocket(`ws://localhost:8000/rooms/${code}`);
+  const ws = new WebSocket(`ws://${baseAdrress}/api/ws/${code}`);
+  ws.onopen = () => console.log('✅ Работает!');
+  ws.onerror = (e) => console.log('❌ Не работает:', e);
+  return ws
 };
