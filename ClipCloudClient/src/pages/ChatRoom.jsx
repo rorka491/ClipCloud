@@ -144,7 +144,7 @@ export default function ChatRoom() {
                     </div>
                 </div>
 
-                <div className="flex justify-center pr-3">
+                <div className="flex justify-center">
                     <div className="absolute w-full px-3 md:px-0 md:w-2xl bottom-0 py-4">
                         <div className="w-full border rounded-xl py-1 flex bg-white">
 
