@@ -1,20 +1,19 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { ArrowUp, Copy, Plus } from "lucide-react";
 import { createSocket } from "../Api/rooms";
-import Popup from "../components/Popup";
+import CopyButton from "../components/CopyButton";
+import MessageComposer from "../components/MessageComposer";
+import RoomCode from "../components/RoomCode";
 
 export default function ChatRoom() {
     const { code } = useParams();
 
     const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState("");
-    const [menuOpen, setMenuOpen] = useState(false);
     const [blocked, setBlocked] = useState(false);
+    const [hasScroll, setHasScroll] = useState(false);
 
     const socketRef = useRef(null);
     const scrollRef = useRef(null);
-    const textareaRef = useRef(null);
 
     useEffect(() => {
         const ws = createSocket(code);
@@ -23,6 +22,8 @@ export default function ChatRoom() {
             console.log("SERVER:", event.data);
 
             const msg = JSON.parse(event.data);
+            console.log(msg)
+
 
             switch (msg.type) {
                 case "history":
@@ -65,25 +66,10 @@ export default function ChatRoom() {
 
         socketRef.current = ws;
 
+
         return () => ws.close();
     }, [code]);
 
-    const sendMessage = () => {
-        if (!input.trim() || !socketRef.current || blocked) return;
-
-        socketRef.current.send(
-            JSON.stringify({
-                type: "text",
-                content: input,
-            })
-        );
-
-        setInput("");
-
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "40px";
-        }
-    };
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -91,37 +77,37 @@ export default function ChatRoom() {
         }
     }, [messages]);
 
-    const handleOnKeyDown = (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    };
 
-    const handleOnInput = (e) => {
-        const el = e.target;
-        el.style.height = "40px";
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
 
-        if (el.value) {
-            const newHeight = el.scrollHeight;
-            const maxHeight = 120;
+        const checkScroll = () => {
+            setHasScroll(el.scrollHeight > el.clientHeight);
+        };
 
-            if (newHeight > 40) {
-                el.style.height = Math.min(newHeight, maxHeight) + "px";
-            }
-        }
-    };
+        checkScroll();
+
+        const observer = new ResizeObserver(checkScroll);
+        observer.observe(el);
+
+        return () => observer.disconnect();
+    }, [messages]);
+
+    const formatTime = (iso) =>
+        new Date(iso).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
+    const nickname = localStorage.getItem("nickname")
 
     return (
         <div className="h-screen flex flex-col items-center bg-blue-400/70">
             <div className="h-screen relative flex flex-col w-full">
 
                 <div className="flex justify-center">
-                    <div className="absolute flex justify-center items-center py-2">
-                        <div className="rounded-xl text-center text-2xl px-7 py-2 border font-bold bg-white">
-                            {code}
-                        </div>
-                    </div>
+                    <RoomCode code={code} />
                 </div>
 
                 <div
@@ -134,60 +120,25 @@ export default function ChatRoom() {
                                 key={i}
                                 className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
                             >
-                                {m.content}
+                                <div className="flex justify-end text-sm text-blue-600/80">
+                                    {nickname}
+                                </div>
+                                <div className="text-end whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full inline-flex flex-col">
+                                    {m.content}
 
-                                <button
-                                    className="self-end text-gray-700 hover:text-gray-900 text-sm"
-                                    onClick={() =>
-                                        navigator.clipboard.writeText(m.content)
-                                    }
-                                >
-                                    <Copy width={15} />
-                                </button>
+                                </div>
+                                <div className="flex justify-between gap-2">
+                                    <span className="text-sm">{formatTime(m.created_at)}</span>
+                                    <CopyButton text={m.content} />
+                                </div>
+
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className="flex justify-center">
-                    <div className="absolute w-full md:w-2xl bottom-0 py-4">
-                        <div className="w-full border rounded-xl flex">
-
-                            <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
-                                <button
-                                    onClick={() => setMenuOpen(!menuOpen)}
-                                    type="button"
-                                    className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200"
-                                >
-                                    <Plus />
-                                </button>
-
-                                <Popup menuOpen={menuOpen} />
-                            </div>
-
-                            <textarea
-                                className="flex-1 bg-white p-2 focus:outline-none resize-none h-10 scrollbar-textarea-custom"
-                                value={input}
-                                disabled={blocked}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={handleOnKeyDown}
-                                onInput={handleOnInput}
-                                ref={textareaRef}
-                            />
-
-                            <div className="flex items-end bg-white rounded-r-xl pr-0.5">
-                                <button
-                                    disabled={blocked}
-                                    className={`bg-white rounded-3xl px-2 py-2 cursor-pointer transition duration-200 
-                                    ${blocked ? "opacity-50 cursor-not-allowed" : "hover:bg-black/20"}`}
-                                    onClick={sendMessage}
-                                >
-                                    <ArrowUp />
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
+                <div className={`flex justify-center  ${hasScroll ? "md:mr-2.5" : ""}`}>
+                    <MessageComposer blocked={blocked} socketRef={socketRef} />
                 </div>
 
             </div>

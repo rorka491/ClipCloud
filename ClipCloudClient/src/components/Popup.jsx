@@ -1,10 +1,9 @@
 import { useRef } from "react";
-import { Image, Video, File } from "lucide-react";
+import { Image, File } from "lucide-react";
 
 export default function Popup({ menuOpen }) {
 
     const imageInputRef = useRef(null);
-    const videoInputRef = useRef(null);
     const fileInputRef = useRef(null);
 
     const handleFileSelect = (type, files) => {
@@ -27,13 +26,6 @@ export default function Popup({ menuOpen }) {
                 />
                 <input
                     type="file"
-                    accept="video/*"
-                    style={{ display: "none" }}
-                    ref={videoInputRef}
-                    onChange={(e) => handleFileSelect("Video", e.target.files)}
-                />
-                <input
-                    type="file"
                     style={{ display: "none" }}
                     ref={fileInputRef}
                     onChange={(e) => handleFileSelect("File", e.target.files)}
@@ -46,12 +38,7 @@ export default function Popup({ menuOpen }) {
                     <Image /> Image
                 </button>
 
-                <button
-                    className="flex gap-2 items-center hover:bg-black/10 rounded-lg px-2 py-1 cursor-pointer"
-                    onClick={() => videoInputRef.current.click()}
-                >
-                    <Video /> Video
-                </button>
+                
 
                 <button
                     className="flex gap-2 items-center hover:bg-black/10 rounded-lg px-2 py-1 cursor-pointer"
