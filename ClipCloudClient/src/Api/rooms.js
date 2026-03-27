@@ -49,8 +49,4 @@ export const createSocket = (code) => {
 //   ws.onclose = () => console.log("🔴 WebSocket closed");
 
 //   return ws;
-<<<<<<< HEAD
 // };
-=======
-// };
->>>>>>> main
