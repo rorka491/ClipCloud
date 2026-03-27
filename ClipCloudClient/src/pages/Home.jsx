@@ -27,6 +27,7 @@ export default function Home() {
         } catch (err) {
             console.error("Ошибка создания комнаты:", err);
         }
+
     };
 
     return (
@@ -44,7 +45,11 @@ export default function Home() {
                 </button>
 
                 <button
+<<<<<<< HEAD
                     className="bg-white hover:text-white cursor-pointer hover:bg-black/25 transition duration-200 h-8 rounded-2xl  px-8 md:px-0 w-full"
+=======
+                    className="bg-white hover:text-white cursor-pointer hover:bg-black/25 transition duration-200 h-8 rounded-2xl  px-5 md:px-0 w-full"
+>>>>>>> main
                     onClick={() => navigate("/join")}
                 >
                     Присоединиться

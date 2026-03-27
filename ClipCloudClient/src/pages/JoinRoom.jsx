@@ -35,7 +35,10 @@ export default function JoinRoom() {
                     placeholder="Код комнаты"
                     value={code}
                     onChange={(e) => setCode((e.target.value).toUpperCase())}
+<<<<<<< HEAD
                     onKeyDown={handleOnKeyDown}
+=======
+>>>>>>> main
                 />
 
                 <button className="bg-white cursor-pointer hover:bg-black/25 hover:text-white transition duration-200 h-8 rounded-xl w-full" onClick={joinRoom}>

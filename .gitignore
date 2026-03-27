@@ -79,3 +79,10 @@ pnpm-debug.log*
 # =========================
 *.swp
 *.swo
+
+
+redisdata/
+*.rdb
+*.aof
+dump.rdb
+appendonly.aof

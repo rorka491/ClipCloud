@@ -1,5 +1,7 @@
+// Убираем baseAddress, используем window.location
+
 export const createRoom = async () => {
-  const res = await fetch("http://localhost:8000/rooms", {
+  const res = await fetch(`/api/rooms`, {
     method: "POST",
   });
 
@@ -11,8 +13,8 @@ export const createRoom = async () => {
 };
 
 export const checkRoom = async (code) => {
-  const res = await fetch(`http://localhost:8000/rooms/${code}`, {
-    method: "POST",
+  const res = await fetch(`/api/rooms/${code}`, {
+    method: "GET",
   });
 
   if (!res.ok) {
@@ -47,4 +49,8 @@ export const createSocket = (code) => {
 //   ws.onclose = () => console.log("🔴 WebSocket closed");
 
 //   return ws;
+<<<<<<< HEAD
 // };
+=======
+// };
+>>>>>>> main

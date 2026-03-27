@@ -10,7 +10,13 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    # allow_origins=[
+    #     "https://clipcloud.cloud.nstu.ru",
+    #     "http://clipcloud.cloud.nstu.ru",
+    #     "https://localhost",
+    #     "http://localhost",
+    # ],
+    allow_origins = ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

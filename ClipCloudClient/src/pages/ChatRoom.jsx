@@ -1,9 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+<<<<<<< HEAD
 import { createSocket } from "../Api/rooms";
 import CopyButton from "../components/CopyButton";
 import MessageComposer from "../components/MessageComposer";
 import RoomCode from "../components/RoomCode";
+=======
+import { ArrowUp, Plus } from "lucide-react";
+import { createSocket } from "../Api/rooms";
+import Popup from "../components/Popup";
+import CopyButton from "../components/CopyButton";
+>>>>>>> main
 
 export default function ChatRoom() {
     const { code } = useParams();
@@ -102,9 +109,10 @@ export default function ChatRoom() {
 
     const nickname = localStorage.getItem("nickname")
 
+
     return (
-        <div className="h-screen flex flex-col items-center bg-blue-400/70">
-            <div className="h-screen relative flex flex-col w-full">
+        <div className="h-dvh md:h-screen w-full flex flex-col items-center bg-blue-400/70">
+            <div className="h-full relative flex flex-col w-full">
 
                 <div className="flex justify-center">
                     <RoomCode code={code} />
@@ -112,7 +120,7 @@ export default function ChatRoom() {
 
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom py-16"
+                    className="flex-1 overflow-y-auto p-4 flex flex-col items-end scrollbar-div-custom py-18"
                 >
                     <div className="w-full md:w-2xl mx-auto flex flex-col gap-1 items-end">
                         {messages.map((m, i) => (
@@ -132,13 +140,59 @@ export default function ChatRoom() {
                                     <CopyButton text={m.content} />
                                 </div>
 
+<<<<<<< HEAD
+=======
+                                <CopyButton text={m.content} />
+>>>>>>> main
                             </div>
                         ))}
                     </div>
                 </div>
 
+<<<<<<< HEAD
                 <div className={`flex justify-center  ${hasScroll ? "md:mr-2.5" : ""}`}>
                     <MessageComposer blocked={blocked} socketRef={socketRef} />
+=======
+                <div className="flex justify-center">
+                    <div className="absolute w-full px-3 md:px-0 md:w-2xl bottom-0 py-4">
+                        <div className="w-full border rounded-xl py-1 flex bg-white">
+
+                            <div className="relative flex items-end bg-white rounded-l-xl pr-0.5">
+                                <button
+                                    onClick={() => setMenuOpen(!menuOpen)}
+                                    type="button"
+                                    className="bg-white rounded-3xl px-2 py-2 cursor-pointer hover:bg-black/20 transition duration-200"
+                                >
+                                    <Plus />
+                                </button>
+
+                                <Popup menuOpen={menuOpen} />
+                            </div>
+
+                            <textarea
+                                className="flex-1 min-w-0 bg-white p-2  focus:outline-none resize-none h-10 scrollbar-textarea-custom"
+                                value={input}
+                                disabled={blocked}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={handleOnKeyDown}
+                                onInput={handleOnInput}
+                                ref={textareaRef}
+                            />
+
+                            <div className="flex items-end bg-white rounded-r-xl pr-0.5">
+                                <button
+                                    disabled={blocked}
+                                    className={`bg-white rounded-3xl px-2 py-2 cursor-pointer transition duration-200 
+                                    ${blocked ? "opacity-50 cursor-not-allowed" : "hover:bg-black/20"}`}
+                                    onClick={sendMessage}
+                                >
+                                    <ArrowUp />
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+>>>>>>> main
                 </div>
 
             </div>
