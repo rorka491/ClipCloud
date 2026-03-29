@@ -1,19 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { createRoom } from "../Api/rooms";
+import NicknameInput from "../components/NicknameInput";
 import { useState } from "react";
+import generateNickname from "../GenerateNickname/generateNickname";
 
 export default function Home() {
     const navigate = useNavigate();
-
-    function generateNickname() {
-        const numbers = []
-
-        for (let number = 0; number < 12; number++) {
-            const rand = Math.floor(Math.random() * 12)
-            numbers.push(rand)
-        }
-        return `User-${numbers.join('')} `
-    }
 
 
     const [nickname, setNickname] = useState(() => generateNickname())
@@ -35,8 +27,7 @@ export default function Home() {
 
             <div className="flex flex-col gap-2 w-full md:w-sm md:px-15 
                             ml-32 mr-32 mt-16 mb-16">
-                <input placeholder={nickname} onChange={(e) => setNickname(e.target.value)} className="bg-white outline-none text-center h-8 rounded-2xl w-full" type="text" />
-
+                <NicknameInput nickname={nickname} setNickname={setNickname} />
                 <button
                     className="bg-white hover:text-white cursor-pointer hover:bg-black/25 transition duration-200 h-8 rounded-2xl w-full"
                     onClick={handleCreate}

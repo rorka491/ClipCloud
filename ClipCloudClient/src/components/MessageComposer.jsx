@@ -1,5 +1,5 @@
 import { memo, useRef, useState } from 'react'
-import Popup from "../components/Popup";
+import Popup from "./PopupFiles";
 import { ArrowUp, Plus } from "lucide-react";
 
 

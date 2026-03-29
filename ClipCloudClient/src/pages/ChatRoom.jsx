@@ -24,7 +24,6 @@ export default function ChatRoom() {
             const msg = JSON.parse(event.data);
             console.log(msg)
 
-
             switch (msg.type) {
                 case "history":
                     setMessages(msg.messages);
@@ -65,7 +64,6 @@ export default function ChatRoom() {
         };
 
         socketRef.current = ws;
-
 
         return () => ws.close();
     }, [code]);

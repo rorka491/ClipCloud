@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkRoom } from "../Api/rooms";
+import NicknameInput from "../components/NicknameInput";
+import generateNickname from "../GenerateNickname/generateNickname";
 
 export default function JoinRoom() {
-    const [code, setCode] = useState("");
+    const getRoomFromUrl = () => {
+        const params = new URLSearchParams(window.location.search)
+        return params.get("room") || ""
+    }
+    const [code, setCode] = useState(getRoomFromUrl());
+    const [nickname, setNickname] = useState(() => generateNickname())
+
     const navigate = useNavigate();
 
     const joinRoom = async () => {
@@ -11,6 +19,7 @@ export default function JoinRoom() {
 
         try {
             const findRoom = await checkRoom(code)
+            localStorage.setItem('nickname', nickname)
             console.log(findRoom)
             if (findRoom) {
                 navigate(`/room/${code}`);
@@ -30,6 +39,7 @@ export default function JoinRoom() {
     return (
         <div className="bg-blue-400/70 flex w-full h-screen justify-center items-center ">
             <div className="flex flex-col gap-2 w-full md:w-sm px-15">
+                <NicknameInput nickname={nickname} setNickname={setNickname} />
                 <input
                     className="bg-white w-full h-8 text-center rounded-xl outline-none"
                     placeholder="Код комнаты"

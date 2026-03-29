@@ -7,9 +7,9 @@ const RoomCode = ({ code }) => {
     const [showQR, setShowQR] = useState(false)
 
     const hiddenCode = "*".repeat(code.length)
-    const roomUrl = `${window.location.origin}/room/${code}`
+    const roomUrl = `${window.location.origin}/join?room=${code}`
     return (
-        <div className="absolute flex justify-center items-center py-2">
+        <div className="absolute flex justify-center items-center py-2 z-50">
             <div className="flex w-37.5 h-12.5 items-center justify-center gap-1 rounded-xl pl-2 pr-2 py-2 border font-bold bg-white">
                 <button
                     onClick={() => setShowQR(true)}
