@@ -13,7 +13,6 @@ class RateLimiter:
     async def is_limited(
         self,
         ip_address: str,
-        room_code: str,
         endpoint: str,
         max_requests: int,
         window_seconds: int
@@ -21,7 +20,7 @@ class RateLimiter:
         if not self.is_active:
             return False
         
-        key = f"rate_limiter:{endpoint}:{ip_address}:{room_code}"
+        key = f"rate_limiter:{endpoint}:{ip_address}"
 
         current_ms = time() * 1000
         window_start_ms = current_ms - window_seconds * 1000

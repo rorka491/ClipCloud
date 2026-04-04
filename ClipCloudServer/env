@@ -1,0 +1,5 @@
+REDIS_ADDRES = localhost:6379
+ACCESS_KEY = 
+SECRET_KEY = 
+ENDPOINT_URL = s3.ru-3.storage.selcloud.ru
+BUCKET_NAME = clip-cloud 

@@ -1,11 +1,10 @@
 from fastapi import WebSocket
 from typing import Dict, List
-
+import logging
 
 
 class ConnectionService:
-    def __init__(self):
-        self.connections: Dict[str, List[WebSocket]] = {}
+    connections: Dict[str, List[WebSocket]] = {}
 
     async def connect(self, room_code: str, websocket: WebSocket):
         await websocket.accept()
@@ -17,7 +16,10 @@ class ConnectionService:
             if not self.connections[room_code]:
                 del self.connections[room_code]
 
+
     async def broadcast(self, room_code: str, message: dict):
+        logging.warning(f"Broadcast to {room_code}")
+
         if room_code in self.connections:
             for websocket in self.connections[room_code]:
                 await websocket.send_json(message)
