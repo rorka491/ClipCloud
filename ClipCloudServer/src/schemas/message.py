@@ -1,5 +1,5 @@
-from datetime import datetime
-from pydantic import BaseModel, Field, HttpUrl, AnyUrl, Discriminator
+from datetime import datetime, UTC
+from pydantic import BaseModel, Field, HttpUrl, AnyUrl, Discriminator, ConfigDict
 import uuid
 from src.enums import MessageTypeEnum, MessageCreateTypeEnum
 from typing import Optional, Literal, Union, Annotated
@@ -13,18 +13,18 @@ class BaseMessage(BaseModel):
 
 
 class TextMessageRead(BaseMessage):
-    type: Literal[MessageCreateTypeEnum.TEXT] = MessageCreateTypeEnum.TEXT
+    message_type: Literal[MessageCreateTypeEnum.TEXT] = MessageCreateTypeEnum.TEXT
     text: str = Field(..., max_length=6000)
 
 
 class ImageMessageRead(BaseMessage):
-    type: Literal[MessageCreateTypeEnum.IMAGE] = MessageCreateTypeEnum.IMAGE
+    message_type: Literal[MessageCreateTypeEnum.IMAGE] = MessageCreateTypeEnum.IMAGE
     text: Optional[str] = Field(None, max_length=200)
     file_url: AnyUrl
 
 
 class FileMessageRead(BaseMessage):
-    type: Literal[MessageCreateTypeEnum.FILE] = MessageCreateTypeEnum.FILE
+    message_type: Literal[MessageCreateTypeEnum.FILE] = MessageCreateTypeEnum.FILE
     text: Optional[str] = Field(None, max_length=200)
     file_url: AnyUrl
 
@@ -35,16 +35,16 @@ MessageRead = Annotated[
         ImageMessageRead,
         FileMessageRead,
     ],
-    Discriminator('type') 
+    Discriminator('message_type') 
 ]
 
 class MessageHistoryResponse(BaseModel):
-    type: Literal[MessageTypeEnum.HISTORY] = MessageTypeEnum.HISTORY
+    message_type: Literal[MessageTypeEnum.HISTORY] = MessageTypeEnum.HISTORY
     messages_history: list[MessageRead] 
 
 
 class RateLimitResponse(BaseModel):
-    type: Literal[MessageTypeEnum.RATE_LIMIT_ERROR] = MessageTypeEnum.RATE_LIMIT_ERROR
+    message_type: Literal[MessageTypeEnum.RATE_LIMIT_ERROR] = MessageTypeEnum.RATE_LIMIT_ERROR
     content: str = Field(default='Too many requests')
 
 # class MessageResponse(BaseModel):
@@ -64,11 +64,24 @@ class RateLimitResponse(BaseModel):
 #     file_url: Optional[AnyUrl] = None
 #     created_at: datetime
 
+class MessageCreateInternal(BaseModel):
+    room_id: int
+    message_type: MessageCreateTypeEnum
+    text: str = Field(..., max_length=6000)
+    file_url: Optional[AnyUrl] = None
+    username: str = Field(max_length=12, default='User')
+    created_at: datetime = datetime.now(UTC)
+
+    
+    
+class MessageReadInternal(MessageCreateInternal):
+
+    model_config = ConfigDict(from_attributes=True)
 
 class MessageCreate(BaseModel):
-    type: MessageCreateTypeEnum
-    text: str = Field(..., max_length=6000)
-    author_name: str = Field(max_length=12, default='User')
+    message_type: MessageCreateTypeEnum
+    text: Optional[str] = Field(max_length=6000)
+    username: str = Field(max_length=12, default='User')
 
 
 

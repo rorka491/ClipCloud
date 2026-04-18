@@ -1,6 +1,8 @@
-from src.dependency.factory import rate_limiter_factory
+from src.dependency.redis import get_redis
+from functools import lru_cache
+from src.services.rate_limit import RateLimiter
 
 
-ws_chat_rate_limit = rate_limiter_factory('ws', 10, 5)
-create_room_rate_limit = rate_limiter_factory('create_room', 10, 5)
-get_room_rate_limit = rate_limiter_factory('get_room', 10, 5)
+@lru_cache
+def get_rate_limiter():
+    return RateLimiter(get_redis())

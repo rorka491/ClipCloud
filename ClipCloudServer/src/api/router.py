@@ -7,12 +7,12 @@ from datetime import datetime, UTC
 import logging
 from typing import Annotated, Optional
 from src.services.rate_limit import RateLimiter
-from src.dependency.factory import create_room_rate_limit, get_room_rate_limit, default_rate_limit
+from src.dependency import create_room_rate_limit, get_room_rate_limit, default_rate_limit
 from src.dependency.services import get_message_service, get_room_service, get_connection_service
 from src.dependency.factory import rate_limiter_factory
 from src.dependency.forms import get_form_data
-from src.schemas.message import MessageHistoryResponse
-from src.dependency.validation import room_exists
+from src.schemas.message import MessageHistoryResponse, MessageReadInternal
+from src.dependency.repositories import get_room_or_exc
 
 
 
@@ -22,7 +22,7 @@ router = APIRouter(prefix='/api')
 @router.websocket(
     "/notify/{code}",
     dependencies=[
-        Depends(room_exists),
+        Depends(get_room_or_exc),
     ]
 )
 async def websocket_endpoint_v2(
@@ -47,18 +47,18 @@ async def websocket_endpoint_v2(
 async def create_room(
     service: Annotated[RoomService, Depends(get_room_service)],
 ):
-    room_code = await service.create_room()
-    return {"code": room_code}
+    room_code, room_id = await service.create_room()
+    return {"code": room_code, 'id': room_id}
 
 
 @router.get(
     "/rooms/{code}",
     dependencies=[
         Depends(default_rate_limit),
-        Depends(room_exists),
+        Depends(get_room_or_exc),
     ]
 )
-async def get_room(
+async def room_is_exists(
     code,
     service: Annotated[RoomService, Depends(get_room_service)],
 ):
@@ -67,10 +67,10 @@ async def get_room(
 
 @router.get(
     "/rooms/{code}/history",
-    response_model=MessageHistoryResponse,
+    response_model=list[MessageReadInternal],
     dependencies=[
         Depends(default_rate_limit),
-        Depends(room_exists),
+        Depends(get_room_or_exc),
     ]
 )
 async def get_history(
@@ -82,7 +82,7 @@ async def get_history(
     '/rooms/{code}/messages',
     dependencies=[
         Depends(default_rate_limit),
-        Depends(room_exists),
+        Depends(get_room_or_exc),
     ]
 )
 async def create_message(

@@ -1,29 +1,19 @@
 from fastapi import Path, Depends
-from functools import lru_cache
-from typing import Annotated, Callable
-from src.services.rate_limit import RateLimiter
+from typing import Annotated
 from src.services.message import MessageService
 from src.services.s3client import S3Client
 from src.core.config import ACCESS_KEY, SECRET_KEY, BUCKET_NAME, ENDPOINT_URL
-from src.dependency.redis import get_redis
+
 from src.services.connecrions import ConnectionService
 from src.services.room import RoomService
+from src.repositories import MessageRepository, RoomRepository
+from src.dependency.repositories import get_message_repository, get_room_repository
+from src.dependency.redis import get_redis 
 
 
 
 
-def inject(getter: Callable):
-    def decorator(func):
-        def wrapper(self, *args, **kwargs):
-            dep = getter()
-            return func(self, *args, dep=dep, **kwargs)
-        return wrapper
-    return decorator
 
-
-@lru_cache
-def get_rate_limiter():
-    return RateLimiter(get_redis())
 
 
 
@@ -36,22 +26,27 @@ def get_s3_client() -> S3Client:
     )
 
 
-
-
 def get_connection_service():
     return ConnectionService()
 
 async def get_message_service(
     code: Annotated[str, Path(...)],
     s3_client: Annotated[S3Client, Depends(get_s3_client)],
-    connection_service: Annotated[ConnectionService, Depends(get_connection_service)]
+    connection_service: Annotated[ConnectionService, Depends(get_connection_service)],
+    repo: Annotated[MessageRepository, Depends(get_message_repository)],
+    redis = Depends(get_redis)
 ) -> MessageService:
     return MessageService(
         code=code, 
         s3_client=s3_client, 
-        connection_service=connection_service
+        connection_service=connection_service,
+        repo=repo,
+        redis=redis
     )
 
-def get_room_service(): 
-    return RoomService()
+def get_room_service(
+    repo: Annotated[RoomRepository, Depends(get_room_repository)],
+    redis = Depends(get_redis)
+): 
+    return RoomService(repo, redis)
 

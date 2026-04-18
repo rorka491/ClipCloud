@@ -1,14 +1,21 @@
 from typing import Annotated
 from fastapi import Request, Depends, HTTPException, Path
-from src.dependency.services import get_rate_limiter
+from src.dependency.rate_limit import get_rate_limiter
 from src.services.rate_limit import RateLimiter
-from typing import Optional
+
+
 
 def rate_limiter_factory(
     endpoint: str,
     max_requests: int,
-    window_seconds: int
+    window_seconds: int,
+    test_mode: bool = False
 ):
+    if test_mode:
+        def test():
+            return
+        return test
+    
     async def dependency(
         request: Request,
         rate_limiter: Annotated[RateLimiter, Depends(get_rate_limiter)],
@@ -27,13 +34,6 @@ def rate_limiter_factory(
                 detail=f"Rate limit exceeded for {endpoint}. Max {max_requests} requests per {window_seconds} seconds"
             )
     return dependency
-
-
-
-create_room_rate_limit = rate_limiter_factory('create_room', 10, 5)
-get_room_rate_limit = rate_limiter_factory('get_room', 10, 5)
-get_history_rate_limit = rate_limiter_factory('hisotry', 10, 5)
-default_rate_limit = rate_limiter_factory('default', 10, 5)
 
 
 

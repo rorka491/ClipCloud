@@ -1,63 +1,54 @@
 from datetime import timedelta, datetime, UTC
 from uuid import uuid4
 import json
-from src.models import Room, Message
-from src.dependency.redis import get_redis
+from fastapi import HTTPException
+from tortoise.exceptions import IntegrityError
 from src.core.config import TTL
-from src.schemas.room import RoomCreate
-from src.constants import ALL
+from src.services.s3client import S3Client
+from src.utils import is_expired
+from src.repositories import RoomRepository
 
 
 
 class RoomService:
-    ROOM = 'room:{}'
-    MESSAGES = 'room:{}:messages'
     
-    def __init__(self):
-        self.redis = get_redis()
+    def __init__(self, repo, redis):
+        self.redis = redis
         self.TTL = TTL
+        self.repo: RoomRepository = repo
 
-    async def create_room(self) -> str:
-        while True:
-            code = uuid4().hex[:4].upper()
-            room_key = self.ROOM.format(code)
-
-            now = datetime.now(UTC)
-            expires_at = now + timedelta(seconds=self.TTL)
-
-            room_data = RoomCreate(
-                created_at=now,
-                expires_at=expires_at,
-                messages_count=0
-            ).model_dump(mode='json')
-
-            created = await self.redis.set(
-                room_key,
-                json.dumps(room_data),
-                ex=self.TTL,
-                nx=True
+    async def create_room(self) -> tuple[str, int]:
+        try:
+            room_code, room_id = await self.repo.create()
+        except IntegrityError as e:
+            raise HTTPException(
+                status_code=500,
+                detail='Failed to create room'
             )
+        return room_code, room_id
 
-            if created:
-                return code
-
+    async def get(self, code: str):
+        room = await self.repo.get(code)
+        if room is None:
+            raise HTTPException(
+                status_code=404,
+                detail='Failed to found room'
+            )
+        return room
+    
+    async def delete_expired_rooms(self, codes):
+        return await self.repo.batch_delete(codes)
+    
+    async def get_expired_rooms(self) -> list[str]:
+        return await self.repo.get_expired_rooms()
 
     async def exists(self, code: str) -> bool:
-        return await self.redis.exists(f"room:{code}") > 0
-
-    async def delete_room(self, code: str):
-        room_key = f"room:{code}"
-        async with self.redis.pipeline() as pipe:
-            pipe.multi()
-            pipe.delete(room_key)
-            await pipe.execute()
+        return await self.repo.exists(code=code)
+    
     
     async def _refresh_ttl(self, code: str):
-        room_key = f"room:{code}"
-        
-        async with self.redis.pipeline() as pipe:
-            pipe.expire(room_key, self.TTL)
-            await pipe.execute()
+        return await self.repo.refresh_expires_at(code=code)
+
 
 
 

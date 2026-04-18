@@ -10,9 +10,9 @@ def get_form_data(
 ) -> MessageCreate:
     try:
         return MessageCreate(
-            type=type,
+            message_type=type,
             text=text,
-            author_name=author_name
+            username=author_name
         )
     except ValueError as e:
         raise HTTPException(
