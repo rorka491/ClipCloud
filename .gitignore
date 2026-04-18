@@ -89,4 +89,4 @@ redisdata/
 *.rdb
 *.aof
 dump.rdb
-appendonly.aof
+appendonly.aofpgdata/

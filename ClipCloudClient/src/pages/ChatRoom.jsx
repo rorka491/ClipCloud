@@ -1,17 +1,8 @@
-<<<<<<< HEAD
-import { useParams } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
-import { ArrowUp, Plus } from "lucide-react";
-import { createSocket } from "../Api/rooms";
-import Popup from "../components/Popup";
-import CopyButton from "../components/CopyButton";
-=======
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { ArrowUp, Copy, Plus } from "lucide-react";
 import { createSocket, getHistory, sendTextMessage } from "../Api/rooms";
 import Popup from "../components/Popup";
->>>>>>> c2fe769 (Вторая версия проекта)
 
 export default function ChatRoom() {
     const { code } = useParams();
@@ -123,13 +114,6 @@ export default function ChatRoom() {
                         {messages.map((m, i) => (
                             <div
                                 key={i}
-<<<<<<< HEAD
-                                className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
-                            >
-                                {m.content}
-
-                                <CopyButton text={m.content} />
-=======
                                 className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
                             >
                                 {m.text || ""}
@@ -142,7 +126,6 @@ export default function ChatRoom() {
                                 >
                                     <Copy width={15} />
                                 </button>
->>>>>>> c2fe769 (Вторая версия проекта)
                             </div>
                         ))}
                     </div>
