@@ -12,8 +12,7 @@ from src.repositories import RoomRepository
 
 class RoomService:
     
-    def __init__(self, repo, redis):
-        self.redis = redis
+    def __init__(self, repo):
         self.TTL = TTL
         self.repo: RoomRepository = repo
 
@@ -44,11 +43,10 @@ class RoomService:
 
     async def exists(self, code: str) -> bool:
         return await self.repo.exists(code=code)
-    
+
     
     async def _refresh_ttl(self, code: str):
         return await self.repo.refresh_expires_at(code=code)
-
 
 
 

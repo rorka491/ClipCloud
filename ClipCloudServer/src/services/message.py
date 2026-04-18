@@ -13,8 +13,7 @@ from src.repositories import MessageRepository
 
 
 class MessageService:
-    def __init__(self, code, s3_client, connection_service, repo, redis):
-        self.redis = redis
+    def __init__(self, code, s3_client, connection_service, repo):
         self.room_code = code
         self.room_key = f"room:{code}"
         self.s3_client: S3Client = s3_client
@@ -94,5 +93,4 @@ class MessageService:
             username=message.username,
             created_at=datetime.now(UTC)
         )
-
 

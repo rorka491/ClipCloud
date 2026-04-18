@@ -1,13 +1,14 @@
+from collections import defaultdict, deque
+from threading import Lock
 from time import time
-from random import randint
-from redis.asyncio import Redis
 
 
 
 
 class RateLimiter:
-    def __init__(self, redis: Redis) -> None:
-        self._redis = redis
+    def __init__(self) -> None:
+        self._buckets: dict[str, deque[float]] = defaultdict(deque)
+        self._lock = Lock()
         self.is_active = True
 
     async def is_limited(
@@ -21,26 +22,16 @@ class RateLimiter:
             return False
         
         key = f"rate_limiter:{endpoint}:{ip_address}"
+        now = time()
+        window_start = now - window_seconds
 
-        current_ms = time() * 1000
-        window_start_ms = current_ms - window_seconds * 1000
+        with self._lock:
+            bucket = self._buckets[key]
+            while bucket and bucket[0] < window_start:
+                bucket.popleft()
 
-        current_request = f"{current_ms}-{randint(1, 100_000)}"
+            if len(bucket) >= max_requests:
+                return True
 
-        async with self._redis.pipeline(transaction=True) as pipe:
-            await pipe.zremrangebyscore(key, 0, window_start_ms)
-
-            await pipe.zcard(key)
-            await pipe.zadd(key, {current_request: current_ms})
-
-            await pipe.expire(key, window_seconds)
-
-
-            res = await pipe.execute()
-        
-        _, current_count, _, _ = res
-        if current_count >= max_requests:
-            return True
-        
-        return False
-
+            bucket.append(now)
+            return False

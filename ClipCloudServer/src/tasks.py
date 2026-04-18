@@ -1,16 +1,17 @@
 import asyncio
 from src.repositories.room import RoomRepository
+import logging 
 
-
-CLEANUP_INTERVAL = 60 * 60 
+CLEANUP_INTERVAL = 60
 
 async def cleanup_expired_rooms(room_repo: RoomRepository):
 
     while True:
         try:
-            await room_repo.batch_delete()
+            count_rooms = await room_repo.batch_delete()
+            logging.warning(f'count rooms {count_rooms}')
             await asyncio.sleep(CLEANUP_INTERVAL)
             
         except Exception as e:
-            print(f"Ошибка при очистке комнат: {e}")
             await asyncio.sleep(CLEANUP_INTERVAL)
+

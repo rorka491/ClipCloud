@@ -27,6 +27,9 @@ env/
 *.sqlite3
 *.db
 
+
+.pgdata
+
 # migrations (опционально — обычно НЕ игнорят в проде)
 # */migrations/*
 

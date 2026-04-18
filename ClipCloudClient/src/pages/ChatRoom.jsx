@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { ArrowUp, Plus } from "lucide-react";
 import { createSocket } from "../Api/rooms";
 import Popup from "../components/Popup";
 import CopyButton from "../components/CopyButton";
+=======
+import { useParams } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { ArrowUp, Copy, Plus } from "lucide-react";
+import { createSocket, getHistory, sendTextMessage } from "../Api/rooms";
+import Popup from "../components/Popup";
+>>>>>>> c2fe769 (Вторая версия проекта)
 
 export default function ChatRoom() {
     const { code } = useParams();
@@ -18,49 +26,27 @@ export default function ChatRoom() {
     const textareaRef = useRef(null);
 
     useEffect(() => {
+        const loadHistory = async () => {
+            try {
+                const history = await getHistory(code);
+                setMessages(Array.isArray(history) ? history : []);
+            } catch (error) {
+                console.error("Ошибка загрузки истории:", error);
+            }
+        };
+
+        loadHistory();
+    }, [code]);
+
+    useEffect(() => {
         const ws = createSocket(code);
 
         ws.onmessage = (event) => {
             console.log("SERVER:", event.data);
 
             const msg = JSON.parse(event.data);
-
-            switch (msg.type) {
-                case "history":
-                    setMessages(msg.messages);
-                    break;
-
-                case "text":
-                    setMessages((prev) => [...prev, msg]);
-                    break;
-
-                case "rate_limit":
-                    setBlocked(true);
-                    alert("Слишком много сообщений. Подожди немного.");
-
-                    setTimeout(() => {
-                        setBlocked(false);
-                    }, 3000);
-
-                    break;
-
-                case "error":
-                    if (msg.message?.toLowerCase().includes("too many")) {
-                        setBlocked(true);
-                        alert("Слишком много сообщений. Подожди немного.");
-
-                        setTimeout(() => {
-                            setBlocked(false);
-                        }, 3000);
-
-                        break;
-                    }
-
-                    alert(msg.message || "Ошибка сервера");
-                    break;
-
-                default:
-                    console.log("Unknown message type:", msg);
+            if (msg?.message_type) {
+                setMessages((prev) => [...prev, msg]);
             }
         };
 
@@ -69,20 +55,23 @@ export default function ChatRoom() {
         return () => ws.close();
     }, [code]);
 
-    const sendMessage = () => {
-        if (!input.trim() || !socketRef.current || blocked) return;
+    const sendMessage = async () => {
+        if (!input.trim() || blocked) return;
+        try {
+            await sendTextMessage(code, { text: input });
+            setInput("");
 
-        socketRef.current.send(
-            JSON.stringify({
-                type: "text",
-                content: input,
-            })
-        );
-
-        setInput("");
-
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "40px";
+            if (textareaRef.current) {
+                textareaRef.current.style.height = "40px";
+            }
+        } catch (error) {
+            if (error?.status === 429) {
+                setBlocked(true);
+                alert("Слишком много сообщений. Подожди немного.");
+                setTimeout(() => setBlocked(false), 3000);
+                return;
+            }
+            console.error("Ошибка отправки:", error);
         }
     };
 
@@ -134,11 +123,26 @@ export default function ChatRoom() {
                         {messages.map((m, i) => (
                             <div
                                 key={i}
+<<<<<<< HEAD
                                 className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
                             >
                                 {m.content}
 
                                 <CopyButton text={m.content} />
+=======
+                                className="whitespace-pre-wrap wrap-break-word overflow-wrap-anywhere max-w-full bg-white rounded-xl px-5 py-1 inline-flex flex-col"
+                            >
+                                {m.text || ""}
+
+                                <button
+                                    className="self-end text-gray-700 hover:text-gray-900 text-sm"
+                                    onClick={() =>
+                                        navigator.clipboard.writeText(m.text || "")
+                                    }
+                                >
+                                    <Copy width={15} />
+                                </button>
+>>>>>>> c2fe769 (Вторая версия проекта)
                             </div>
                         ))}
                     </div>

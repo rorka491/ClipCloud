@@ -1,7 +1,7 @@
-// Убираем baseAddress, используем window.location
+const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 export const createRoom = async () => {
-  const res = await fetch(`/api/rooms`, {
+  const res = await fetch(`${API_BASE}/rooms`, {
     method: "POST",
   });
 
@@ -13,7 +13,7 @@ export const createRoom = async () => {
 };
 
 export const checkRoom = async (code) => {
-  const res = await fetch(`/api/rooms/${code}`, {
+  const res = await fetch(`${API_BASE}/rooms/${encodeURIComponent(code)}`, {
     method: "GET",
   });
 
@@ -23,6 +23,7 @@ export const checkRoom = async (code) => {
 
   const data = await res.json();
 
+<<<<<<< HEAD
   if (!data.is_exists) {
     alert("Комната не найдена");
     console.log(data.is_exists)
@@ -50,3 +51,55 @@ export const createSocket = (code) => {
 
 //   return ws;
 // };
+=======
+  return Boolean(data.is_exists);
+};
+
+export const getHistory = async (code) => {
+  const res = await fetch(
+    `${API_BASE}/rooms/${encodeURIComponent(code)}/history`,
+    {
+      method: "GET",
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch room history");
+  }
+
+  return res.json();
+};
+
+export const sendTextMessage = async (code, { text, authorName = "User" }) => {
+  const formData = new FormData();
+  formData.append("type", "text");
+  formData.append("text", text);
+  formData.append("author_name", authorName);
+
+  const res = await fetch(
+    `${API_BASE}/rooms/${encodeURIComponent(code)}/messages`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    const error = new Error("Failed to send message");
+    error.status = res.status;
+    throw error;
+  }
+
+  return res.json();
+};
+
+export const createSocket = (code) => {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const ws = new WebSocket(
+    `${protocol}//${window.location.host}/api/notify/${encodeURIComponent(code)}`
+  );
+  ws.onopen = () => console.log('✅ Работает!');
+  ws.onerror = (e) => console.log('❌ Не работает:', e);
+  return ws
+};
+>>>>>>> c2fe769 (Вторая версия проекта)

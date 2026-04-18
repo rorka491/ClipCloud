@@ -18,10 +18,13 @@ services:
       context: ./ClipCloudServer
     ports:
       - 8000:8000
+    env_file:
+      - ./ClipCloudServer/.env
     networks:
       - dev
     depends_on:
-      - redis
+      postgres:
+        condition: service_healthy
   client:
     build: 
       context: ./ClipCloudClient
@@ -29,11 +32,22 @@ services:
       - dev
     depends_on:
       - server
-  redis:
-    image: redis:latest
-    container_name: redis_container
+  postgres:
+    image: postgres:latest
+    env_file:
+      - ./ClipCloudServer/.env
+    environment:
+      POSTGRES_USER: ${DB_USER:-rodion}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-clipcloud}
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ./redisdata:/data
+      - ./ClipCloudServer/pgdata:/var/lib/postgresql/data/pgdata
     networks:
       - dev
-
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
